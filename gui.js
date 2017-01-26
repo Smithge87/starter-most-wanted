@@ -162,24 +162,23 @@ function displayResults(mostWanted) {
     }
 }
 function getRelatives(wanted, data) {
-    var children = getDecendants(wanted, data);
-    var spouse = getSpouse(wanted, data);
-    var parents = getParents(wanted, data);
-    var siblings = getSiblings(parents, data);
-    var grandChildren = getDecendants(children, data);
-    var grandParents = getParents(parents, data);
-    var nieceAndNephew = getDecendants(siblings, data);
-    var auntAndUncle = getSiblings(parents, data);
-    var greatGrandChild = getDecendants(grandChildren, data);
-    var greatGrandParents = getParents(grandParents, data);
+    var children = getRelationDown(wanted, data);
+    var spouse = getRelationLateral(wanted, data);
+    var parents = getRelationUp(wanted, data);
+    var siblings = getRelationDown(parents, data);
+    var grandChildren = getRelationDown(children, data);
+    var grandParents = getRelationUp(parents, data);
+    var nieceAndNephew = getRelationDown(siblings, data);
+    var auntAndUncle = getRelationDown(parents, data);
+    var greatGrandChild = getRelationDown(grandChildren, data);
+    var greatGrandParents = getRelationUp(grandParents, data);
 }
-function getDecendants(wanted, data) {
+function getRelationDown(wanted, data) {
     var relatives = [];
     var someRelatives = [];
     var moreRelatives = [];
     if (wanted.length == 0) { }
     else {
-        var someRelatives = [];
         for (let i = 0 ; i <wanted.length ; i++){
             someRelatives = data.filter(function (people) {
                 return (people["parents"].includes((wanted[i])["id"]));
@@ -189,7 +188,22 @@ function getDecendants(wanted, data) {
     }
     return relatives;
 }
-function getSpouse(wanted, data) {
+function getRelationUp(wanted, data) {
+    var parents = [];
+    var partParents = [];
+    var moreParents = [];
+    if (wanted.length == 0) { }
+    else {
+        for (let i = 0 ; i < wanted.length ; i++) {
+            partParents = data.filter(function (people) {
+                return ((wanted[i])["parents"].includes(people["id"]));
+            });
+            parents = moreParents.concat(partParents);
+        }
+    }
+    return parents;
+}
+function getRelationLateral(wanted, data) {
     var someRelatives = [];
     if (typeof (wanted[0])["currentSpouse"] != "undefined") {
         someRelatives = data.filter(function (people) {
@@ -198,33 +212,4 @@ function getSpouse(wanted, data) {
     }
     return someRelatives;
 }
-function getParents(wanted, data) {
-    var parents = [];
-    var partParents = [];
-    var moreParents = [];
-    if (wanted.length == 0){}
-    else{
-        for (let i = 0 ; i <wanted.length ; i++){
-            partParents = data.filter(function (people) {
-                return ((wanted[i])["parents"].includes(people["id"]));
-                parents = moreParents.concat(partParents)
-            });
-        }
-    }
-    return parents;
-}
-function getSiblings(parents, data) {
-    var siblings = [];
-    var someSiblings = [];
-    var moreSiblings = [];
-    if (parents.length == 0){}
-    else{
-        for (let i = 0; i < parents.length ; i++) {
-            someSiblings = data.filter(function (people) {
-                return (people["parents"].includes((parents[i])["id"]));
-                siblings = moreSiblings.concat(someSiblings);
-            });
-        }
-    }
-        return siblings;
-}
+
