@@ -8,6 +8,7 @@ function initAlert(people) {
     var wanted = processPromptRelative(cleanMostWanted, "Please enter a first and last name to find decendants", isContent, isInArray, mostWanted);
     var wantedObject = getObject(wanted, people);
     var relatives = getRelatives(wantedObject, people);
+    alert(cleanObject(wantedObject));
 }
 // BEGIN FUNCTIONS FOR FINDING MOST WANTED
 function getPeople(people) {
@@ -28,7 +29,6 @@ function getFilter(firstPrompt, secondPrompt, typeCheck, converter, searchVariab
     var request = processPrompt(answer, secondPrompt, isContent, typeCheck);
     var requestCleaned = converter(request, isContent);
     var result = searchDatabase(requestCleaned, searchVariable, data);
-    //var checkedResult = endCheck(result, request, resultAlert);
     return result;
 }
 //Shared processing functions
@@ -42,9 +42,6 @@ function processPrompt(answer, question, content, valid){
     if (answer == "no") {
         var request = " ";
     }
-    //else if (answer == "exit") {
-    //    var request = answer;
-    //}
     else {
         do {
             var request = prompt(question);}
@@ -53,10 +50,9 @@ function processPrompt(answer, question, content, valid){
 }
 function processPromptRelative(mostWanted, question, content, valid, data) {
             do {
-                var wanted = prompt((indexNames(mostWanted))+ question);
+                var wanted = prompt((indexNames(mostWanted))+ "\n"+ question);
             }
             while (!content(wanted) || !valid(wanted, data));
-        
         return wanted;
 }
 function getObject(person, data) {
@@ -109,14 +105,6 @@ function getFullName(person,index) {
     var fullname = [person.firstName,person.lastName].join(" ");
     return fullname;
 }
-
-//function endCheck(data, request) {
-//    if (data.length > 1 || request == "exit") {
-//    }
-//    else {
-//        return data;
-//    }
-//}
 //Simple machines
 function isString(x) {
     return (typeof x === "string");
@@ -146,9 +134,9 @@ function isInArray(x, data) {
     }
 }
 function indexNames(people) {
-    var indexedNames = [];
+    var indexedNames = "";
     for (let x=0; x<people.length; x++){
-        indexedNames[x] = ((people[x]) + "\n").replace(/,/g, "");
+        indexedNames += (((people[x]).replace(",", "")) + "\n");
     }
     return indexedNames;
 }
@@ -158,7 +146,7 @@ function displayResults(mostWanted) {
         alert("Your search did not return any results");
     }
     else {
-        alert(("Your search retured " + mostWanted.length +" results:\n") + (indexNames(mostWanted)) + "\nPlease press 'OK' to continue.");
+        alert(("Your search retured " + mostWanted.length +" results:\n\n") + (indexNames(mostWanted)) + "\nPlease press 'OK' to continue.");
     }
 }
 function getRelatives(wanted, data) {
@@ -212,4 +200,11 @@ function getRelationLateral(wanted, data) {
     }
     return someRelatives;
 }
-
+function cleanObject(people) {
+    stringPeople = people.map(function (person) {
+        return (JSON.stringify(person));
+    });
+    cleanedPeople = stringPeople.map(function (person) {
+        return (person.replace("{", ""), person.replace("}", ""), person.replace(",", "\n"));
+    });
+}
