@@ -182,7 +182,7 @@ function getDecendants(wanted, data) {
         var someRelatives = [];
         for (let i = 0 ; i <wanted.length ; i++){
             someRelatives = data.filter(function (people) {
-                return (people["parents"].includes((wanted[i])["id"]) && ((wanted[i])["id"]) != people["id"]);
+                return (people["parents"].includes((wanted[i])["id"]));
             });
             relatives = moreRelatives.concat(someRelatives);
         }
@@ -193,7 +193,7 @@ function getSpouse(wanted, data) {
     var someRelatives = [];
     if (typeof (wanted[0])["currentSpouse"] != "undefined") {
         someRelatives = data.filter(function (people) {
-            return (people["currentSpouse"] == ((wanted[0])["id"]) && ((wanted[0])["id"]) != people["id"]);
+            return (people["currentSpouse"] == ((wanted[0])["id"]));
         });
     }
     return someRelatives;
