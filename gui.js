@@ -20,7 +20,7 @@ function getPeople(people) {
     remainingPeople = getFilter("occupation", "Please enter an occupation", isString, lowerRequest, "occupation", remainingPeople);
     remainingPeople = getFilter("height", "Please enter a height (feet' inches'')", isNumber, parseHeight, "height", remainingPeople);
     remainingPeople = getFilter("weight", "Please enter a weight in pounds", isNumber, parseRequest, "weight", remainingPeople);
-    remainingPeople = getFilter("age", "Please enter an age in years", isNumber, processAge, "dob", remainingPeople);
+    remainingPeople = getFilter("age", "Please enter an age in years", isNumber, parseAge, "dob", remainingPeople);
     return remainingPeople;
 }
 function getFilter(firstPrompt, secondPrompt, typeCheck, converter, searchVariable, data)
@@ -77,13 +77,14 @@ function lowerRequest(string, content) {
     }
 }
 function parseRequest(number, content) {
-    if (content(number)) {
+    if (content(number) && isNumber(number)) {
         var cleanedNumber = parseInt(number);
         return cleanedNumber;
     }
+    else { return " " }
 }
 function parseHeight(number, content) {
-    if (content(number)) {
+    if (content(number) && isNumber(number)) {
         height = number.split(" ");
         if (height.length > 1) {
             var feetToInches = ((parseInt(height[1].replace(/\D/g, ""))) + (12 * (parseInt((height[0].replace(/\D/g, ""))))));
@@ -91,11 +92,15 @@ function parseHeight(number, content) {
         }
         else { return (12*(parseInt(height[0].replace(/\D/g, "")))) }
     }
+    else { return " "}
 }
-function processAge(age) {
-    var year = new Date();
-    var birthYear = (parseInt(year.getFullYear())-(parseInt(age)));
-    return birthYear;
+function parseAge(age, content) {
+    if (content(age) && isNumber(age)) {
+        var year = new Date();
+        var birthYear = (parseInt(year.getFullYear()) - (parseInt(age)));
+        return birthYear;
+    }
+    else { return " " }
 }
 function searchDatabase(searchItem, dbItem, data) {
     if (typeof searchItem == "string") {
@@ -222,8 +227,8 @@ function getRelationLateral(wanted, data) {
     return someRelatives;
 }
 function displayRelativeResults(person, family) {
-    alert("Most Wanted Information: \n\n" + cleanObject(person) + "\n\nFamily:\n\n" + "Children: " + cleanNames(family[0])
-        + "\nSpouse: " + cleanNames(family[1]) + "\nParents: " + cleanNames(family[2]) + "\nSiblings: " + cleanNames(family[3])
+    alert("Most Wanted Information: \n\n" + cleanObject(person) + "\n\nFamily:\n\n" + "Spouse: " + cleanNames(family[0])
+        + "\Children: " + cleanNames(family[1]) + "\nParents: " + cleanNames(family[2]) + "\nSiblings: " + cleanNames(family[3])
         + "\nGrandChildren: " + cleanNames(family[4]) + "\nGrandparents: " + cleanNames(family[5]) + "\nNieces and Nephews: " + cleanNames(family[6])
         + "\nAunts and Uncles: " + cleanNames(family[7]) + "\nGreat Grandchildren: " + cleanNames(family[8]) + "\nGreat Grandparents: " + cleanNames(family[9])
         +"\n\nNext of kin: "+nextOfKin(family)+"\n\n\n Please press 'OK' to exit");
