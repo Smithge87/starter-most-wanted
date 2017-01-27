@@ -8,7 +8,7 @@ function initAlert(people) {
     var wanted = processPromptRelative(cleanMostWanted, "Please enter a first and last name to find decendants", isContent, isInArray, mostWanted);
     var wantedObject = getObject(wanted, people);
     var relatives = getRelatives(wantedObject, people);
-    alert(cleanObject(wantedObject));
+    alert(cleanObject(wantedObject[0]));
 }
 // BEGIN FUNCTIONS FOR FINDING MOST WANTED
 function getPeople(people) {
@@ -18,9 +18,9 @@ function getPeople(people) {
     remainingPeople = getFilter("gender", "Please enter a gender, 'male' or 'female'", isString, lowerRequest, "gender", remainingPeople);
     remainingPeople = getFilter("eye color", "Please enter and eye color", isString, lowerRequest, "eyeColor", remainingPeople);
     remainingPeople = getFilter("occupation", "Please enter an occupation", isString, lowerRequest, "occupation", remainingPeople);
-    remainingPeople = getFilter("height", "Please enter a height in inches", isNumber, parseRequest, "height", remainingPeople);
+    remainingPeople = getFilter("height", "Please enter a height (feet' inches'')", isNumber, parseHeight, "height", remainingPeople);
     remainingPeople = getFilter("weight", "Please enter a weight in pounds", isNumber, parseRequest, "weight", remainingPeople);
-    remainingPeople = getFilter("age", "Please enter an age in years", isNumber, processAge, "age", remainingPeople);
+    remainingPeople = getFilter("age", "Please enter an age in years", isNumber, processAge, "dob", remainingPeople);
     return remainingPeople;
 }
 function getFilter(firstPrompt, secondPrompt, typeCheck, converter, searchVariable, data)
@@ -82,15 +82,32 @@ function parseRequest(number, content) {
         return cleanedNumber;
     }
 }
+function parseHeight(number, content) {
+    if (content(number)) {
+        height = number.split(" ");
+        if (height.length > 1) {
+            var feetToInches = ((parseInt(height[1].replace(/\D/g, ""))) + (12 * (parseInt((height[0].replace(/\D/g, ""))))));
+            return feetToInches;
+        }
+        else { return (12*(parseInt(height[0].replace(/\D/g, "")))) }
+    }
+}
 function processAge(age) {
     var year = new Date();
     var birthYear = (parseInt(year.getFullYear())-(parseInt(age)));
     return birthYear;
 }
 function searchDatabase(searchItem, dbItem, data) {
-    var matchList = [];
-    matchList = data.filter(function (person) { if (person[dbItem] == searchItem) { return true } else { return false } });
-    if (matchList.length == 0) {
+    if (typeof searchItem == "string") {
+        matchList = data.filter(function (person) { if (person[dbItem] == searchItem) { return true } else { return false } });
+    }
+    else
+    {
+            matchList = data.filter(function (person) {
+                if (((person[dbItem]).toString()).includes(searchItem.toString())) { return true } else { return false }
+            });
+    }
+    if (matchList.length == 0 ) {
         return data;
     }
     else {
@@ -205,6 +222,6 @@ function cleanObject(people) {
         return (JSON.stringify(person));
     });
     cleanedPeople = stringPeople.map(function (person) {
-        return (person.replace("{", ""), person.replace("}", ""), person.replace(",", "\n"));
+        return (person.replace("{", "").replace("}", "").replace(",", "\n"));
     });
 }
