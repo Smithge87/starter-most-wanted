@@ -228,7 +228,7 @@ function getRelationLateral(wanted, data) {
 }
 function displayRelativeResults(person, family) {
     alert("Most Wanted Information: \n\n" + cleanObject(person) + "\n\nFamily:\n\n" + "Spouse: " + cleanNames(family[0])
-        + "\Children: " + cleanNames(family[1]) + "\nParents: " + cleanNames(family[2]) + "\nSiblings: " + cleanNames(family[3])
+        + "\nChildren: " + cleanNames(family[1]) + "\nParents: " + cleanNames(family[2]) + "\nSiblings: " + cleanNames(family[3])
         + "\nGrandChildren: " + cleanNames(family[4]) + "\nGrandparents: " + cleanNames(family[5]) + "\nNieces and Nephews: " + cleanNames(family[6])
         + "\nAunts and Uncles: " + cleanNames(family[7]) + "\nGreat Grandchildren: " + cleanNames(family[8]) + "\nGreat Grandparents: " + cleanNames(family[9])
         +"\n\nNext of kin: "+nextOfKin(family)+"\n\n\n Please press 'OK' to exit");
