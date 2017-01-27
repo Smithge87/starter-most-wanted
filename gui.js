@@ -1,14 +1,14 @@
 
 function initAlert(people) {
-    var result = [];
-    alert("Welcome to the Most Wanted Database.\nThere are " + people.length + " persons currently in the database\nPlease press 'OK' to begin");
-    var mostWanted = getPeople(people);
-    var cleanMostWanted = getNames(mostWanted);
-    displayFilterResults(cleanMostWanted);
-    var wanted = processPromptRelative(cleanMostWanted, "Please enter a first and last name to find decendants", isContent, isInArray, mostWanted);
-    var wantedObject = getObject(wanted, people);
-    var relatives = getRelatives(wantedObject, people);
-    displayRelativeResults(wantedObject, relatives);
+        var result = [];
+        alert("Welcome to the Most Wanted Database.\nThere are " + people.length + " persons currently in the database\nPlease press 'OK' to begin");
+        var mostWanted = getPeople(people);
+        var cleanMostWanted = getNames(mostWanted);
+        displayFilterResults(cleanMostWanted);
+        var wanted = processPromptRelative(cleanMostWanted, "Please enter a first and last name to find decendants", isContent, isInArray, mostWanted);
+        var wantedObject = getObject(wanted, people);
+        var relatives = getRelatives(wantedObject, people);
+        displayRelativeResults(wantedObject, relatives);
 }
 // BEGIN FUNCTIONS FOR FINDING MOST WANTED
 function getPeople(people) {
@@ -48,9 +48,9 @@ function processPrompt(answer, question, content, valid){
         while (!content(request) || !valid(request));}
     return request;
 }
-function processPromptRelative(mostWanted, question, content, valid, data) {
+function processPromptRelative(people, question, content, valid, data) {
             do {
-                var wanted = prompt((indexNames(mostWanted))+ "\n"+ question);
+                var wanted = prompt((indexNames(people))+ "\n"+ question);
             }
             while (!content(wanted) || !valid(wanted, data));
         return wanted;
@@ -58,11 +58,11 @@ function processPromptRelative(mostWanted, question, content, valid, data) {
 function getObject(person, data) {
     var names = person.split(" ");
         cappedName = names.map(function (name) {
-            return name[0].toUpperCase() + name.substring(1).toLowerCase()
+            return name[0].toUpperCase() + name.substring(1).toLowerCase();
         });
         var hasName = [];
         hasName = data.filter(function (person) { if ((person["firstName"] == cappedName[0]) && (person["lastName"] == cappedName[1])) { return true } else { return false } });
-        return (hasName)
+        return (hasName);
 }
 function capRequest(string, content){
     if (content(string)){
@@ -107,7 +107,11 @@ function searchDatabase(searchItem, dbItem, data) {
                 if (((person[dbItem]).toString()).includes(searchItem.toString())) { return true } else { return false }
             });
     }
-    if (matchList.length == 0 ) {
+    if (matchList.length == 0 && searchItem != " ") {
+        alert("No one in our database met the filter requirements.\n\nCurrent filter will be excluded.");
+        return data;
+    }
+    else if (matchList.length == 0) {
         return data;
     }
     else {
@@ -115,12 +119,10 @@ function searchDatabase(searchItem, dbItem, data) {
     }
 }
 function getNames(people) {
-    var cleanedWanted = people.map(getFullName);
+    var cleanedWanted = people.map(function (person) {
+        return ([person.firstName, person.lastName].join(" "));
+    });
     return cleanedWanted;
-}
-function getFullName(person,index) {
-    var fullname = [person.firstName,person.lastName].join(" ");
-    return fullname;
 }
 //Simple machines
 function isString(x) {
@@ -167,8 +169,8 @@ function displayFilterResults(mostWanted) {
     }
 }
 function getRelatives(wanted, data) {
-    var children = getRelationDown(wanted, data, wanted);
     var spouse = getRelationLateral(wanted, data);
+    var children = getRelationDown(wanted, data, wanted);
     var parents = getRelationUp(wanted, data, wanted);
     var siblings = getRelationDown(parents, data, wanted);
     var grandChildren = getRelationDown(children, data, wanted);
@@ -177,7 +179,7 @@ function getRelatives(wanted, data) {
     var auntAndUncle = getRelationDown(grandParents, data, wanted);
     var greatGrandChild = getRelationDown(grandChildren, data, wanted);
     var greatGrandParents = getRelationUp(grandParents, data, wanted);
-    var relatives = [children, spouse, parents, siblings, grandChildren, grandParents, nieceAndNephew, auntAndUncle, greatGrandChild, greatGrandParents];
+    var relatives = [spouse, children, parents, siblings, grandChildren, grandParents, nieceAndNephew, auntAndUncle, greatGrandChild, greatGrandParents];
     return relatives;
 }
 function getRelationDown(wanted, data, exclusion) {
@@ -223,7 +225,8 @@ function displayRelativeResults(person, family) {
     alert("Most Wanted Information: \n\n" + cleanObject(person) + "\n\nFamily:\n\n" + "Children: " + cleanNames(family[0])
         + "\nSpouse: " + cleanNames(family[1]) + "\nParents: " + cleanNames(family[2]) + "\nSiblings: " + cleanNames(family[3])
         + "\nGrandChildren: " + cleanNames(family[4]) + "\nGrandparents: " + cleanNames(family[5]) + "\nNieces and Nephews: " + cleanNames(family[6])
-        + "\nAunts and Uncles: " + cleanNames(family[7]) + "\nGreat Grandchildren: " + cleanNames(family[8]) + "\nGreat Grandparents: " + cleanNames(family[9]));
+        + "\nAunts and Uncles: " + cleanNames(family[7]) + "\nGreat Grandchildren: " + cleanNames(family[8]) + "\nGreat Grandparents: " + cleanNames(family[9])
+        +"\n\nNext of kin: "+nextOfKin(family)+"\n\n\n Please press 'OK' to exit");
 }
 function cleanObject(people) {
     stringPeople = people.map(function (person) {
@@ -244,4 +247,16 @@ function cleanNames(people) {
         return (wholeName);
     });
     return namedPeople;
+}
+function nextOfKin(family) {
+    var nextOfKin = "";
+    for (let i = 0; i < family.length; i++) {
+        if (family[i].length > 0 && nextOfKin == "") {
+            var nextOfKin = (cleanNames(family[i]))[0];
+        }
+    }
+    if (nextOfKin == "") {
+        nextOfKin== "No next of kin"
+    }
+    return nextOfKin;
 }
