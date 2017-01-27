@@ -4,11 +4,11 @@ function initAlert(people) {
     alert("Welcome to the Most Wanted Database.\nThere are " + people.length + " persons currently in the database\nPlease press 'OK' to begin");
     var mostWanted = getPeople(people);
     var cleanMostWanted = getNames(mostWanted);
-    displayResults(cleanMostWanted);
+    displayFilterResults(cleanMostWanted);
     var wanted = processPromptRelative(cleanMostWanted, "Please enter a first and last name to find decendants", isContent, isInArray, mostWanted);
     var wantedObject = getObject(wanted, people);
     var relatives = getRelatives(wantedObject, people);
-    alert(cleanObject(wantedObject[0]));
+    displayRelativeResults(wantedObject, relatives);
 }
 // BEGIN FUNCTIONS FOR FINDING MOST WANTED
 function getPeople(people) {
@@ -158,7 +158,7 @@ function indexNames(people) {
     return indexedNames;
 }
 // BEGIN FUNCTIONS FOR FINDING RELATIVES    
-function displayResults(mostWanted) {
+function displayFilterResults(mostWanted) {
     if (mostWanted.length < 1) {
         alert("Your search did not return any results");
     }
@@ -167,18 +167,20 @@ function displayResults(mostWanted) {
     }
 }
 function getRelatives(wanted, data) {
-    var children = getRelationDown(wanted, data);
+    var children = getRelationDown(wanted, data, wanted);
     var spouse = getRelationLateral(wanted, data);
-    var parents = getRelationUp(wanted, data);
-    var siblings = getRelationDown(parents, data);
-    var grandChildren = getRelationDown(children, data);
-    var grandParents = getRelationUp(parents, data);
-    var nieceAndNephew = getRelationDown(siblings, data);
-    var auntAndUncle = getRelationDown(parents, data);
-    var greatGrandChild = getRelationDown(grandChildren, data);
-    var greatGrandParents = getRelationUp(grandParents, data);
+    var parents = getRelationUp(wanted, data, wanted);
+    var siblings = getRelationDown(parents, data, wanted);
+    var grandChildren = getRelationDown(children, data, wanted);
+    var grandParents = getRelationUp(parents, data, wanted);
+    var nieceAndNephew = getRelationDown(siblings, data, wanted);
+    var auntAndUncle = getRelationDown(grandParents, data, wanted);
+    var greatGrandChild = getRelationDown(grandChildren, data, wanted);
+    var greatGrandParents = getRelationUp(grandParents, data, wanted);
+    var relatives = [children, spouse, parents, siblings, grandChildren, grandParents, nieceAndNephew, auntAndUncle, greatGrandChild, greatGrandParents];
+    return relatives;
 }
-function getRelationDown(wanted, data) {
+function getRelationDown(wanted, data, exclusion) {
     var relatives = [];
     var someRelatives = [];
     var moreRelatives = [];
@@ -186,14 +188,14 @@ function getRelationDown(wanted, data) {
     else {
         for (let i = 0 ; i <wanted.length ; i++){
             someRelatives = data.filter(function (people) {
-                return (people["parents"].includes((wanted[i])["id"]));
+                return ((people["parents"].includes((wanted[i])["id"]))&& (((exclusion[0])["id"]) != people["id"])) ;
             });
             relatives = moreRelatives.concat(someRelatives);
         }
     }
     return relatives;
 }
-function getRelationUp(wanted, data) {
+function getRelationUp(wanted, data, exclusion) {
     var parents = [];
     var partParents = [];
     var moreParents = [];
@@ -201,7 +203,7 @@ function getRelationUp(wanted, data) {
     else {
         for (let i = 0 ; i < wanted.length ; i++) {
             partParents = data.filter(function (people) {
-                return ((wanted[i])["parents"].includes(people["id"]));
+                return (((wanted[i])["parents"].includes(people["id"])) && (((exclusion[0])["id"]) != people["id"]));
             });
             parents = moreParents.concat(partParents);
         }
@@ -217,11 +219,29 @@ function getRelationLateral(wanted, data) {
     }
     return someRelatives;
 }
+function displayRelativeResults(person, family) {
+    alert("Most Wanted Information: \n\n" + cleanObject(person) + "\n\nFamily:\n\n" + "Children: " + cleanNames(family[0])
+        + "\nSpouse: " + cleanNames(family[1]) + "\nParents: " + cleanNames(family[2]) + "\nSiblings: " + cleanNames(family[3])
+        + "\nGrandChildren: " + cleanNames(family[4]) + "\nGrandparents: " + cleanNames(family[5]) + "\nNieces and Nephews: " + cleanNames(family[6])
+        + "\nAunts and Uncles: " + cleanNames(family[7]) + "\nGreat Grandchildren: " + cleanNames(family[8]) + "\nGreat Grandparents: " + cleanNames(family[9]));
+}
 function cleanObject(people) {
     stringPeople = people.map(function (person) {
+        delete person.currentSpouse;
+        delete person.parents;
         return (JSON.stringify(person));
     });
     cleanedPeople = stringPeople.map(function (person) {
-        return (person.replace("{", "").replace("}", "").replace(",", "\n"));
+        return (person.replace("{", "").replace("}", "").replace(/,/g, "\n").replace("firstName","First Name").replace("lastName","Last Name")
+            .replace("gender","Gender").replace("dob","Date of Birth").replace("id","ID# ").replace("eyeColor","Eye Color").replace("weight","Weight")
+            .replace("occupation","Occupation").replace(/"/g,"").replace("height","Height").replace(/:/g,": "));
     });
+    return cleanedPeople;
+}
+function cleanNames(people) {
+    namedPeople = people.map(function (person) {
+        var wholeName = person["firstName"] + " " + person["lastName"];
+        return (wholeName);
+    });
+    return namedPeople;
 }
