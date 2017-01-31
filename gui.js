@@ -2,11 +2,14 @@
 function initAlert(people) {
         var result = [];
         alert("Welcome to the Most Wanted Database.\nThere are " + people.length + " persons currently in the database\nPlease press 'OK' to begin");
+        var ages = sortByAge(people);
         var mostWanted = getPeople(people);
         var cleanMostWanted = getNames(mostWanted);
         displayFilterResults(cleanMostWanted);
         var wanted = processPromptRelative(cleanMostWanted, "Please enter a first and last name to find decendants", isContent, isInArray, mostWanted);
         var wantedObject = getObject(wanted, people);
+        var decendants = getDecendants(wantedObject, people);
+        displayDecendantResults(wantedObject, decendants);
         var relatives = getRelatives(wantedObject, people);
         displayRelativeResults(wantedObject, relatives);
 }
@@ -165,6 +168,10 @@ function indexNames(people) {
     return indexedNames;
 }
 // BEGIN FUNCTIONS FOR FINDING RELATIVES    
+function displayDecendantResults(person, decendants) {
+    decendants.shift();
+    alert("Decendants for " + getNames(person) + ":\n\n" + (indexNames(getNames(decendants))) +"\nPlease press enter to find relatives and next of kin");
+}
 function displayFilterResults(mostWanted) {
     if (mostWanted.length < 1) {
         alert("Your search did not return any results");
@@ -226,6 +233,40 @@ function getRelationLateral(wanted, data) {
     }
     return someRelatives;
 }
+function getDecendants(wanted, data) {
+        var relatives = [];
+        var someRelatives = [];
+        var moreRelatives = [];
+        if (wanted.length != 0)
+        {
+            for (let i = 0 ; i < wanted.length ; i++) {
+                someRelatives = data.filter(function (people) {
+                    return ((people["parents"].includes((wanted[i])["id"])));
+                });
+                relatives = moreRelatives.concat(someRelatives);
+            }
+            getDecendants (relatives, data)
+        }
+        relatives = wanted.concat(relatives);
+        return relatives;
+}
+function sortByAge(people) {
+    if (people.length > 0) {
+        var ages = people.map(function (person) {
+            return (parseInt(person["dob"].replace(/[/\\*]/g, ""))) % 10000;
+        })
+        ages.sort();
+        var sortedPeople = [];
+        for (let i = 0; i < ages.length; i++) {
+            for (let j = 0; j < people.length; j++) {
+                if (((parseInt(people[j]["dob"].replace(/[/\\*]/g, ""))) % 10000) == ages[i])
+                    sortedPeople[i] = people[j];
+            }
+        }
+        return sortedPeople;
+    }
+    return people;
+}
 function displayRelativeResults(person, family) {
     alert("Most Wanted Information: \n\n" + cleanObject(person) + "\n\nFamily:\n\n" + "Spouse: " + cleanNames(family[0])
         + "\nChildren: " + cleanNames(family[1]) + "\nParents: " + cleanNames(family[2]) + "\nSiblings: " + cleanNames(family[3])
@@ -254,10 +295,13 @@ function cleanNames(people) {
     return namedPeople;
 }
 function nextOfKin(family) {
+    var cleanFamily = family.map(function (people) {
+        return sortByAge(people)
+    });
     var nextOfKin = "";
-    for (let i = 0; i < family.length; i++) {
-        if (family[i].length > 0 && nextOfKin == "") {
-            var nextOfKin = (cleanNames(family[i]))[0];
+    for (let i = 0; i < cleanFamily.length; i++) {
+        if (cleanFamily[i].length > 0 && nextOfKin == "") {
+            var nextOfKin = (cleanNames(cleanFamily[i]))[0];
         }
     }
     if (nextOfKin == "") {
