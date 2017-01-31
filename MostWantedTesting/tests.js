@@ -30,6 +30,13 @@ function capRequest(string, content){
         return capString;
     }
 }
+function cleanNames(people) {
+    namedPeople = people.map(function (person) {
+        var wholeName = person["firstName"] + " " + person["lastName"];
+        return (wholeName);
+    });
+    return namedPeople;
+}
 
 function lowerRequest(string, content) {
     if (content(string)) {
@@ -144,4 +151,16 @@ function sortByAge(people) {
         return sortedPeople;
     }
     return people;
+}
+function nextOfKin(family) {
+    var cleanFamily = family.map(function (people) {
+        return sortByAge(people)
+    });
+    var nextOfKin = "";
+    for (let i = 0; i < cleanFamily.length; i++) {
+        if (cleanFamily[i].length > 0 && nextOfKin == "") {
+            var nextOfKin = (cleanNames(cleanFamily[i]))[0];
+        }
+    }
+    return nextOfKin;
 }

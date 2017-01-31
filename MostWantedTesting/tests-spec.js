@@ -71,7 +71,13 @@ describe ('function capRequest', function(){
     expect(capRequest("YES", isContent)).toEqual("Yes");
   });
 });
-
+describe ('function cleanNames', function(){
+  it ("takes objects and returns array of names as strings", function(){
+    data = [{id:272822514,firstName:"Billy",lastName:"Bob",gender:"male",dob:"1/18/1949",height:71,weight:175,eyeColor:"brown",occupation:"programmer",parents:[],currentSpouse:401222887},{id:401222887,firstName:"Uma",lastName:"Bob",gender:"female",dob:"4/1/1947",height:65,weight:162,eyeColor:"brown",occupation:"assistant",parents:[],currentSpouse:272822514}];
+    expected = ["Billy Bob","Uma Bob"];
+    expect(cleanNames(data)).toEqual(expected);
+  });
+});
 describe ('function lowerRequest', function(){
   it ("lowercases entire string", function(){
     expect(lowerRequest("YES", isContent)).toEqual("yes");
@@ -169,5 +175,19 @@ describe ('function sortByAge', function(){
     data=[{id:888201200,firstName:"Mader",lastName:"Madden",gender:"male",dob:"5/6/1937",height:76,weight:205,eyeColor:"black",occupation:"landscaper",parents:[],currentSpouse:null},{id:822843554,firstName:"Regina",lastName:"Madden",gender:"female",dob:"7/26/1959",height:71,weight:249,eyeColor:"brown",occupation:"nurse",parents:[693243224,888201200],currentSpouse:null},{id:819168108,firstName:"Hana",lastName:"Madden",gender:"female",dob:"10/7/1953",height:70,weight:187,eyeColor:"brown",occupation:"politician",parents:[693243224,888201200],currentSpouse:null}];
     expected = [{id:888201200,firstName:"Mader",lastName:"Madden",gender:"male",dob:"5/6/1937",height:76,weight:205,eyeColor:"black",occupation:"landscaper",parents:[],currentSpouse:null},{id:819168108,firstName:"Hana",lastName:"Madden",gender:"female",dob:"10/7/1953",height:70,weight:187,eyeColor:"brown",occupation:"politician",parents:[693243224,888201200],currentSpouse:null},{id:822843554,firstName:"Regina",lastName:"Madden",gender:"female",dob:"7/26/1959",height:71,weight:249,eyeColor:"brown",occupation:"nurse",parents:[693243224,888201200],currentSpouse:null}];
     expect(sortByAge(data)).toEqual(expected);
+  });
+});
+describe ('function nextOfKin', function(){
+  it ("finds next of kin from list of immediate family", function(){
+    data=[[],[{id:888201200,firstName:"Mader",lastName:"Madden",gender:"male",dob:"5/6/1937",height:76,weight:205,eyeColor:"black",occupation:"landscaper",parents:[],currentSpouse:null},{id:822843554,firstName:"Regina",lastName:"Madden",gender:"female",dob:"7/26/1959",height:71,weight:249,eyeColor:"brown",occupation:"nurse",parents:[693243224,888201200],currentSpouse:null},{id:819168108,firstName:"Hana",lastName:"Madden",gender:"female",dob:"10/7/1953",height:70,weight:187,eyeColor:"brown",occupation:"politician",parents:[693243224,888201200],currentSpouse:null}],[],[]];
+    expected = "Mader Madden";
+    expect(nextOfKin(data)).toEqual(expected);
+  });
+});
+describe ('function nextOfKin', function(){
+  it ("finds next of kin from list of immediate family", function(){
+    data=[[],[],[],[]];
+    expected = "";
+    expect(nextOfKin(data)).toEqual(expected);
   });
 });
