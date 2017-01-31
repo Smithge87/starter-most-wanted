@@ -87,3 +87,61 @@ function processPrompt(answer, question, content, valid){
         while (!content(request) || !valid(request));}
     return request;
 }
+
+function getRelationDown(wanted, data, exclusion) {
+    var relatives = [];
+    var someRelatives = [];
+    var moreRelatives = [];
+    if (wanted.length == 0) { }
+    else {
+        for (let i = 0 ; i <wanted.length ; i++){
+            someRelatives = data.filter(function (people) {
+                return ((people["parents"].includes((wanted[i])["id"]))&& (((exclusion[0])["id"]) != people["id"])) ;
+            });
+            relatives = moreRelatives.concat(someRelatives);
+        }
+    }
+    return relatives;
+}
+
+function getRelationUp(wanted, data, exclusion) {
+    var parents = [];
+    var partParents = [];
+    var moreParents = [];
+    if (wanted.length == 0) { }
+    else {
+        for (let i = 0 ; i < wanted.length ; i++) {
+            partParents = data.filter(function (people) {
+                return (((wanted[i])["parents"].includes(people["id"])) && (((exclusion[0])["id"]) != people["id"]));
+            });
+            parents = moreParents.concat(partParents);
+        }
+    }
+    return parents;
+}
+function getRelationLateral(wanted, data) {
+    var someRelatives = [];
+    if (typeof (wanted[0])["currentSpouse"] != "undefined") {
+        someRelatives = data.filter(function (people) {
+            return (people["currentSpouse"] == ((wanted[0])["id"]));
+        });
+    }
+    return someRelatives;
+}
+function sortByAge(people) {
+    if (people.length > 0) {
+        var ages = people.map(function (person) {
+            return (parseInt(person["dob"].replace(/[/\\*]/g, ""))) % 10000;
+        })
+        ages.sort();
+        var sortedPeople = [];
+        for (let i = 0; i < ages.length; i++) {
+            for (let j = 0; j < people.length; j++) {
+                if (((parseInt(people[j]["dob"].replace(/[/\\*]/g, ""))) % 10000) == ages[i])
+                    sortedPeople[i] = people[j];
+            }
+        }
+        return sortedPeople;
+    }
+    return people;
+}
